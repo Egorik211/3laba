@@ -1,0 +1,239 @@
+// Класс узла двусвязного списка - хранит данные и ссылки на соседей
+class DNode {
+    int data;      // Данные узла
+    DNode prev;    // Ссылка на предыдущий узел (null для первого)
+    DNode next;    // Ссылка на следующий узел (null для последнего)
+
+    // Конструктор узла - создает узел с данными и обнуляет ссылки
+    DNode(int d) {
+        data = d;
+        prev = null;
+        next = null;
+    }
+}
+
+// Основной класс двусвязного списка
+public class DoublyList {
+    DNode first;   // Указатель на первый элемент списка
+    DNode last;    // Указатель на последний элемент списка
+    int count;     // Количество элементов в списке
+
+    // Конструктор - создает пустой список
+    public DoublyList() {
+        first = null;    // Инициализируем первый элемент как null
+        last = null;     // Инициализируем последний элемент как null
+        count = 0;
+    }
+
+    // Добавляем элемент в начало списка
+    void addFirst(int d) {
+        DNode n = new DNode(d);  // Создаем новый узел
+        if (first == null) {     // Если список пустой
+            first = last = n;    // Новый узел становится и первым, и последним
+        } else {
+            n.next = first;      // Новый узел указывает на старый первый
+            first.prev = n;      // Старый первый указывает на новый узел
+            first = n;           // Новый узел становится первым
+        }
+        count++;                 // Увеличиваем счетчик
+    }
+
+    // Добавляем элемент в конец списка
+    void addLast(int d) {
+        DNode n = new DNode(d);  // Создаем новый узел
+        if (first == null) {     // Если список пустой
+            first = last = n;    // Новый узел - и первый, и последний
+        } else {
+            last.next = n;       // Старый последний указывает на новый узел
+            n.prev = last;       // Новый узел указывает на старый последний
+            last = n;            // Новый узел становится последним
+        }
+        count++;                 // Увеличиваем счетчик
+    }
+
+    // Удаляем первый элемент списка
+    void removeFirst() {
+        if (first != null) {     // Если список не пустой
+            first = first.next;  // Первый перемещается на следующий узел
+            if (first != null) {
+                first.prev = null; // Новый первый элемент не имеет предыдущего
+            } else {
+                last = null;       // Если список стал пустым, обнуляем последний
+            }
+            count--;             // Уменьшаем счетчик
+        }
+    }
+
+    // Удаляем последний элемент списка
+    void removeLast() {
+        if (last != null) {      // Если список не пустой
+            last = last.prev;    // Последний перемещается на предыдущий узел
+            if (last != null) {
+                last.next = null; // Новый последний элемент не имеет следующего
+            } else {
+                first = null;      // Если список стал пустым, обнуляем первый
+            }
+            count--;             // Уменьшаем счетчик
+        }
+    }
+
+    // Удаляем первый найденный элемент с заданным значением
+    boolean remove(int d) {
+        DNode cur = first;       // Начинаем поиск с первого элемента
+        // Ищем узел с нужным значением
+        while (cur != null && cur.data != d) {
+            cur = cur.next;
+        }
+        if (cur != null) {       // Если узел найден
+            // Переподключаем предыдущий узел к следующему
+            if (cur.prev != null) {
+                cur.prev.next = cur.next;
+            } else {
+                first = cur.next;  // Если удаляем первый элемент
+            }
+            // Переподключаем следующий узел к предыдущему
+            if (cur.next != null) {
+                cur.next.prev = cur.prev;
+            } else {
+                last = cur.prev;   // Если удаляем последний элемент
+            }
+            count--;             // Уменьшаем счетчик
+            return true;         // Успешно удалили
+        }
+        return false;            // Элемент не найден
+    }
+
+    // Проверяем наличие элемента в списке
+    boolean contains(int d) {
+        DNode cur = first;       // Начинаем с первого элемента
+        while (cur != null) {
+            if (cur.data == d) return true;  // Нашли элемент
+            cur = cur.next;
+        }
+        return false;            // Элемент не найден
+    }
+
+    // Возвращаем количество элементов
+    int size() {
+        return count;
+    }
+
+    // Проверяем, пуст ли список
+    boolean isEmpty() {
+        return first == null;    // Проверяем первый элемент
+    }
+
+    // Выводим список от начала к концу
+    void display() {
+        DNode cur = first;       // Начинаем с первого
+        while (cur != null) {
+            System.out.print(cur.data + " ");
+            cur = cur.next;
+        }
+        System.out.println();
+    }
+
+    // Выводим список в обратном порядке (от конца к началу)
+    void displayReverse() {
+        DNode cur = last;        // Начинаем с последнего
+        while (cur != null) {
+            System.out.print(cur.data + " ");
+            cur = cur.prev;
+        }
+        System.out.println();
+    }
+
+    // Добавляем элемент по заданной позиции (0 - начало)
+    void add(int pos, int d) {
+        if (pos < 0 || pos > count) return;  // Проверка корректности позиции
+
+        if (pos == 0) {  // Если позиция 0 - добавляем в начало
+            addFirst(d);
+            return;
+        }
+
+        DNode n = new DNode(d);  // Создаем новый узел
+        DNode cur = first;       // Начинаем с первого элемента
+        // Идем к узлу перед позицией вставки
+        for (int i = 0; i < pos - 1; i++) {
+            cur = cur.next;
+        }
+        n.next = cur.next;       // Новый узел указывает на следующий
+        n.prev = cur;            // Новый узел указывает на предыдущий
+        if (cur.next != null) {
+            cur.next.prev = n;   // Следующий узел указывает на новый
+        } else {
+            last = n;            // Если вставляем в конец - обновляем последний
+        }
+        cur.next = n;            // Предыдущий узел указывает на новый
+        count++;                 // Увеличиваем счетчик
+    }
+
+    // Удаляем элемент по позиции и возвращаем его значение
+    int deletePos(int pos) {
+        if (pos < 0 || pos >= count || first == null) return -1;  // Неверная позиция
+
+        DNode cur = first;       // Начинаем с первого
+        // Идем к узлу с нужной позицией
+        for (int i = 0; i < pos; i++) {
+            cur = cur.next;
+        }
+        int val = cur.data;      // Сохраняем значение удаляемого узла
+
+        // Переподключаем предыдущий узел к следующему
+        if (cur.prev != null) {
+            cur.prev.next = cur.next;
+        } else {
+            first = cur.next;    // Если удаляем первый элемент
+        }
+        // Переподключаем следующий узел к предыдущему
+        if (cur.next != null) {
+            cur.next.prev = cur.prev;
+        } else {
+            last = cur.prev;     // Если удаляем последний элемент
+        }
+        count--;                 // Уменьшаем счетчик
+        return val;              // Возвращаем значение удаленного узла
+    }
+
+    // Возвращаем значение элемента по позиции
+    int get(int pos) {
+        if (pos < 0 || pos >= count) return -1;  // Неверная позиция
+        DNode cur = first;       // Начинаем с первого
+        for (int i = 0; i < pos; i++) {
+            cur = cur.next;
+        }
+        return cur.data;
+    }
+
+    // Возвращаем значение первого элемента
+    int getFirst() {
+        return first != null ? first.data : -1;
+    }
+
+    // Возвращаем значение последнего элемента
+    int getLast() {
+        return last != null ? last.data : -1;
+    }
+
+    // Очищаем список
+    void clear() {
+        first = last = null;     // Обнуляем указатели
+        count = 0;               // Сбрасываем счетчик
+    }
+
+
+    public static void main(String[] args) {
+        DoublyList list = new DoublyList();
+        list.addFirst(1);        // Добавляем 1 в начало: [1]
+        list.addLast(3);         // Добавляем 3 в конец: [1, 3]
+        list.add(1, 2);          // Вставляем 2 на позицию 1: [1, 2, 3]
+
+        list.display();          // Вывод: 1 2 3
+        list.displayReverse();   // Вывод: 3 2 1
+
+        System.out.println("Удаляем по позиции 1: " + list.deletePos(1));
+        // Удаляем элемент на позиции 1 (число 2): [1, 3]
+        list.display();          // Вывод: 1 3
+    }
+}
