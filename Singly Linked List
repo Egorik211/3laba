@@ -1,0 +1,130 @@
+class Node {
+    int data;        // Данные узла
+    Node next;       // Ссылка на следующий узел
+
+    Node(int a) {    // Создает узел с числом a
+        data = a;    // Записывает данные
+        next = null; // Пока нет следующего
+    }
+}
+
+public class SinglyList {
+    Node first;      // Первый узел списка
+    int count;       // Количество элементов
+
+    public SinglyList() {  // Создает пустой список
+        first = null;      // Нет элементов
+        count = 0;         // Размер нулевой
+    }
+
+    // Добавляем число a в начало списка
+    void addFirst(int a) {
+        Node n = new Node(a);  // Создаем новый узел
+        n.next = first;        // Новый указывает на старый первый
+        first = n;             // Обновляем начало
+        count++;               // +1 элемент
+    }
+
+    // Добавляем число a в конец списка
+    void addLast(int a) {
+        Node n = new Node(a);  // Создаем новый узел
+        if (first == null) {   // Если список пустой
+            first = n;         // Новый становится первым
+        } else {
+            Node cur = first;  // Начинаем с начала
+            while (cur.next != null) {  // Идем до конца
+                cur = cur.next;
+            }
+            cur.next = n;      // Прикрепляем в конец
+        }
+        count++;               // +1 элемент
+    }
+
+    // Удаляем первый элемент
+    void removeFirst() {
+        if (first != null) {   // Если не пустой
+            first = first.next; // Переходим ко второму
+            count--;           // -1 элемент
+        }
+    }
+
+    // Удаляем последний элемент
+    void removeLast() {
+        if (first == null) return;     // Пустой список
+        if (first.next == null) {      // Один элемент
+            first = null;              // Удаляем его
+            count--;
+            return;
+        }
+        Node cur = first;              // Ищем предпоследний
+        while (cur.next.next != null) {
+            cur = cur.next;
+        }
+        cur.next = null;               // Отрезаем последний
+        count--;                       // -1 элемент
+    }
+
+    // Удаляем первый узел с числом a
+    boolean remove(int a) {
+        if (first == null) return false;  // Пустой список
+
+        if (first.data == a) {            // Первый подходит
+            first = first.next;
+            count--;
+            return true;
+        }
+
+        Node cur = first;                 // Ищем нужный
+        while (cur.next != null && cur.next.data != a) {
+            cur = cur.next;
+        }
+        if (cur.next != null) {           // Нашли
+            cur.next = cur.next.next;
+            count--;
+            return true;
+        }
+        return false;                     // Не нашли
+    }
+
+    // Проверяем наличие числа a
+    boolean contains(int a) {
+        Node cur = first;                 // Начинаем с начала
+        while (cur != null) {             // До конца списка
+            if (cur.data == a) return true;
+            cur = cur.next;
+        }
+        return false;
+    }
+
+    int size() {      // Возвращает размер
+        return count;
+    }
+
+    boolean isEmpty() {  // Пустой ли список
+        return first == null;
+    }
+
+    // Выводим все элементы
+    void display() {
+        Node cur = first;
+        while (cur != null) {
+            System.out.print(cur.data + " ");
+            cur = cur.next;
+        }
+        System.out.println();
+    }
+
+    // Очищаем список
+    void clear() {
+        first = null;
+        count = 0;
+    }
+
+    public static void main(String[] args) {
+        SinglyList list = new SinglyList();
+        list.addFirst(1);     // Добавляем 1 в начало
+        list.addLast(2);      // Добавляем 2 в конец
+        list.display();       // Покажет: 1 2
+        System.out.println("Размер: " + list.size());  // Покажет: 2
+    }
+}
