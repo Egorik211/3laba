@@ -1,0 +1,221 @@
+// Класс узла циклического списка
+class CNode {
+    int data;     // Данные узла (значение)
+    CNode next;   // Ссылка на следующий узел
+
+    // Конструктор узла
+    CNode(int d) {
+        data = d;     // Устанавливаем значение
+        next = this;  // Замыкаем узел сам на себя (цикл из 1 элемента)
+    }
+}
+
+// Основной класс циклического списка
+public class CircularList {
+    CNode head;   // Указатель на первый узел списка
+    int count;    // Счетчик количества элементов
+
+    // Конструктор - создает пустой список
+    public CircularList() {
+        head = null;  // Нет первого узла
+        count = 0;    // 0 элементов
+    }
+
+    // Добавляем элемент в начало списка
+    void addFirst(int d) {
+        CNode n = new CNode(d);  // Создаем новый узел
+        if (head == null) {
+            head = n;            // Если список пуст - новый узел становится первым
+        } else {
+            // Находим последний узел (тот, чей next указывает на head)
+            CNode last = head;
+            while (last.next != head) {
+                last = last.next;
+            }
+            // Вставляем новый узел перед head:
+            n.next = head;       // Новый узел указывает на старый head
+            last.next = n;       // Последний узел указывает на новый узел
+            head = n;            // head теперь указывает на новый узел (в начало)
+        }
+        count++;                 // Увеличиваем счетчик
+    }
+
+    // Добавляем элемент в конец списка
+    void addLast(int d) {
+        CNode n = new CNode(d);  // Создаем новый узел
+        if (head == null) {
+            head = n;            // Если список пуст - новый узел становится первым
+        } else {
+            // Находим последний узел
+            CNode last = head;
+            while (last.next != head) {
+                last = last.next;
+            }
+            // Вставляем новый узел в конец:
+            last.next = n;       // Последний узел указывает на новый
+            n.next = head;       // Новый узел замыкает цикл на head
+        }
+        count++;                 // Увеличиваем счетчик
+    }
+
+    // Удаляем первый элемент
+    void removeFirst() {
+        if (head != null) {      // Если список не пуст
+            if (head.next == head) {  // Если в списке 1 элемент
+                head = null;     // Очищаем список
+            } else {
+                // Находим последний узел
+                CNode last = head;
+                while (last.next != head) {
+                    last = last.next;
+                }
+                // Удаляем первый узел:
+                head = head.next;  // head сдвигаем на следующий
+                last.next = head;  // Последний узел теперь указывает на новый head
+            }
+            count--;             // Уменьшаем счетчик
+        }
+    }
+
+    // Удаляем последний элемент
+    void removeLast() {
+        if (head != null && head.next != head) {  // Если >1 элемента
+            // Ищем предпоследний узел (тот, чей следующий - последний)
+            CNode cur = head;
+            while (cur.next.next != head) {
+                cur = cur.next;
+            }
+            cur.next = head;      // Предпоследний теперь указывает на head (удаляем последний)
+            count--;
+        } else if (head != null) {  // Если 1 элемент
+            head = null;
+            count--;
+        }
+    }
+
+    // Удаляем первый найденный элемент со значением d
+    boolean remove(int d) {
+        if (head == null) return false;  // Пустой список
+
+        if (head.data == d) {            // Если удаляем первый элемент
+            removeFirst();
+            return true;
+        }
+
+        // Ищем элемент по всему списку
+        CNode cur = head;
+        do {
+            if (cur.next.data == d) {    // Нашли следующий узел с нужным значением
+                cur.next = cur.next.next;  // Пропускаем удаляемый узел
+                if (cur.next == head) head = cur;  // Если удалили последний - обновляем head
+                count--;
+                return true;
+            }
+            cur = cur.next;
+        } while (cur != head);           // Проходим полный круг
+        return false;                    // Не нашли
+    }
+
+    // Проверяем наличие элемента со значением d
+    boolean contains(int d) {
+        if (head == null) return false;
+        CNode cur = head;
+        do {
+            if (cur.data == d) return true;  // Нашли
+            cur = cur.next;
+        } while (cur != head);               // Полный круг
+        return false;
+    }
+
+    // Возвращаем количество элементов
+    int size() {
+        return count;
+    }
+
+    // Проверяем, пуст ли список
+    boolean isEmpty() {
+        return head == null;
+    }
+
+    // Выводим все элементы списка
+    void display() {
+        if (head == null) {
+            System.out.println("пусто");
+            return;
+        }
+        CNode cur = head;
+        do {
+            System.out.print(cur.data + " ");  // Выводим значение
+            cur = cur.next;                    // Переходим к следующему
+        } while (cur != head);                 // До возврата к началу
+        System.out.println();                  // Перевод строки
+    }
+
+    // Очищаем список
+    void clear() {
+        head = null;
+        count = 0;
+    }
+
+    // Поворачиваем список (head сдвигается на следующий элемент)
+    void rotate() {
+        if (head != null && head.next != head) {  // Если >1 элемента
+            // Находим последний узел
+            CNode last = head;
+            while (last.next != head) {
+                last = last.next;
+            }
+            CNode first = head;          // Сохраняем старый head
+            head = head.next;            // Новый head - второй элемент
+            last.next = first;           // Последний указывает на старый head
+            first.next = head;           // Старый head теперь указывает на новый head
+        }
+    }
+
+    // Проверяем наличие цикла (в циклическом списке всегда true)
+    boolean findCycle() {
+        return true;  // По определению циклического списка цикл есть
+    }
+
+    // Разделяем список на два циклических списка (head теперь второй)
+    void splitIntoTwo() {
+        if (head == null || head.next == head) return;  // Нельзя разделить
+
+        int half = count / 2;  // Индекс середины
+
+        // Находим середину списка
+        CNode first = head;
+        CNode second = head;
+        for (int i = 0; i < half; i++) {
+            second = second.next;
+        }
+
+        // Находим последний узел первой половины
+        CNode firstLast = head;
+        while (firstLast.next != head) {
+            firstLast = firstLast.next;
+        }
+
+        // Находим последний узел второй половины
+        CNode secondLast = second;
+        while (secondLast.next != head) {
+            secondLast = secondLast.next;
+        }
+
+        // Замыкаем два отдельных цикла
+        firstLast.next = first;   // Первая половина - цикл
+        secondLast.next = second; // Вторая половина - цикл
+        head = second;            // head теперь указывает на второй список
+    }
+
+    public static void main(String[] args) {
+        CircularList list = new CircularList();
+        list.addLast(1);     // Добавляем 1 в конец
+        list.addLast(2);     // Добавляем 2 в конец
+        list.addLast(3);     // Добавляем 3 в конец
+        list.display();      // Вывод: 1 2 3
+
+        list.rotate();       // Поворачиваем: head становится 2
+        list.display();      // Вывод: 2 3 1
+    }
+}
